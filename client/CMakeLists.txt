@@ -27,11 +27,34 @@ if(ANDROID)
     find_library(AAUDIO_LIBRARY NAMES aaudio REQUIRED)
     target_link_libraries(wivrn ${ANDROID_LIBRARY} ${MEDIA_LIBRARY} ${AAUDIO_LIBRARY})
 
-    # The OpenXR loader must be dynamically loaded or the Oculus store will refuse it with "Oculus SDK not found or older than 1.0"
-    set(DYNAMIC_LOADER ON)
-    FetchContent_MakeAvailable(openxr_loader)
-    target_link_libraries(wivrn openxr_loader)
+   if (PICO)
+        set(PICO_SDK_PATH ${CMAKE_SOURCE_DIR}/external/pico)
+        if(NOT EXISTS ${PICO_SDK_PATH})
+            file(GLOB PICO_SDK_PATH ${CMAKE_SOURCE_DIR}/PICO_OpenXR_SDK_*.zip)
 
+            if("${PICO_SDK_ZIP}" STREQUAL "")
+                message(FATAL_ERROR "Download the PICO OpenXR SDK from https://developer-global.pico-interactive.com/sdk in ${CMAKE_SOURCE_DIR}/PICO_OpenXR_SDK_*.zip")
+            endif()
+
+            file(ARCHIVE_EXTRACT
+                    INPUT ${PICO_SDK_ZIP}
+                    DESTINATION ${PICO_SDK_PATH}
+                    PATTERNS include/openxr libs/android
+                    VERBOSE)
+        endif()
+
+        add_library(OpenXR SHARED IMPORTED)
+        target_include_directories(OpenXR INTERFACE
+                ${PICO_SDK_PATH}/include)
+
+        set_property(TARGET OpenXR
+                PROPERTY IMPORTED_LOCATION ${PICO_SDK_PATH}/libs/android.${ANDROID_ABI}/libopenxr_loader.so)
+        target_link_libraries(wivrn OpenXR)
+    else()
+        set(DYNAMIC_LOADER OFF)
+        FetchContent_MakeAvailable(openxr_loader)
+        target_link_libraries(wivrn openxr_loader)
+    endif()
 
     target_link_libraries(wivrn native_app_glue)
     target_compile_definitions(wivrn PRIVATE -DXR_USE_PLATFORM_ANDROID -DVK_USE_PLATFORM_ANDROID_KHR)

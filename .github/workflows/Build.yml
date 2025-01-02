@@ -182,7 +182,7 @@ jobs:
 
     strategy:
       matrix:
-        hmd: ['Standard']
+        hmd: ['Standard', 'Pico']
         buildtype: ['Release', 'Debug', 'DebugWithValidationLayer', 'Oculus']
 
     steps:
