@@ -32,7 +32,6 @@
 #include "wivrn_comp_target.h"
 #include "wivrn_config.h"
 #include "wivrn_eye_tracker.h"
-#include "wivrn_fb_face2_tracker.h"
 #include "wivrn_foveation.h"
 #include "wivrn_ipc.h"
 
@@ -155,9 +154,6 @@ wivrn::wivrn_session::wivrn_session(std::unique_ptr<wivrn_connection> connection
 
 	static_roles.head = xdevs[xdev_count++] = &hmd;
 
-	if (hmd.face_tracking_supported)
-		static_roles.face = &hmd;
-
 	roles.left = xdev_count;
 	static_roles.hand_tracking.left = xdevs[xdev_count++] = &left_hand;
 
@@ -196,12 +192,6 @@ wivrn::wivrn_session::wivrn_session(std::unique_ptr<wivrn_connection> connection
 		foveation = std::make_unique<wivrn_foveation>();
 		static_roles.eyes = eye_tracker.get();
 		xdevs[xdev_count++] = eye_tracker.get();
-	}
-	if (get_info().face_tracking2_fb || is_forced_extension("FB_face_tracking2"))
-	{
-		fb_face2_tracker = std::make_unique<wivrn_fb_face2_tracker>(&hmd, *this);
-		static_roles.face = fb_face2_tracker.get();
-		xdevs[xdev_count++] = fb_face2_tracker.get();
 	}
 
 #if WIVRN_FEATURE_SOLARXR
@@ -316,8 +306,6 @@ void wivrn_session::operator()(const from_headset::tracking & tracking)
 		eye_tracker->update_tracking(tracking, offset);
 	if (foveation)
 		foveation->update_tracking(tracking, offset);
-	if (fb_face2_tracker)
-		fb_face2_tracker->update_tracking(tracking, offset);
 }
 
 void wivrn_session::operator()(from_headset::hand_tracking && hand_tracking)

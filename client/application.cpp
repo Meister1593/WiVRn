@@ -779,7 +779,6 @@ void application::initialize()
 	opt_extensions.push_back(XR_EXT_EYE_GAZE_INTERACTION_EXTENSION_NAME);
 	opt_extensions.push_back(XR_FB_PASSTHROUGH_EXTENSION_NAME);
 	opt_extensions.push_back(XR_HTC_PASSTHROUGH_EXTENSION_NAME);
-	opt_extensions.push_back(XR_FB_FACE_TRACKING2_EXTENSION_NAME);
 	opt_extensions.push_back(XR_EXT_PALM_POSE_EXTENSION_NAME);
 	opt_extensions.push_back(XR_KHR_COMPOSITION_LAYER_DEPTH_EXTENSION_NAME);
 	opt_extensions.push_back(XR_FB_COMPOSITION_LAYER_DEPTH_TEST_EXTENSION_NAME);
@@ -843,13 +842,6 @@ void application::initialize()
 		eye_gaze_supported = eye_gaze_properties.supportsEyeGazeInteraction;
 	}
 
-	if (utils::contains(xr_extensions, XR_FB_FACE_TRACKING2_EXTENSION_NAME))
-	{
-		XrSystemFaceTrackingProperties2FB fb_face2_properties = xr_system_id.fb_face_tracking2_properties();
-		spdlog::info("    FB face tracking support: {}", (bool)fb_face2_properties.supportsVisualFaceTracking);
-		fb_face_tracking2_supported = fb_face2_properties.supportsVisualFaceTracking;
-	}
-
 	switch (xr_system_id.passthrough_supported())
 	{
 		case xr::system::passthrough_type::no_passthrough:
@@ -898,11 +890,6 @@ void application::initialize()
 	{
 		left_hand = xr_session.create_hand_tracker(XR_HAND_LEFT_EXT);
 		right_hand = xr_session.create_hand_tracker(XR_HAND_RIGHT_EXT);
-	}
-
-	if (fb_face_tracking2_supported)
-	{
-		fb_face_tracker2 = xr_session.create_fb_face_tracker2();
 	}
 
 	vk::CommandPoolCreateInfo cmdpool_create_info;

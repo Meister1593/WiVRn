@@ -132,7 +132,6 @@ struct headset_info_packet
 	std::array<XrFovf, 2> fov;
 	bool hand_tracking;
 	bool eye_gaze;
-	bool face_tracking2_fb;
 	bool palm_pose;
 	bool passthrough;
 	std::vector<video_codec> supported_codecs; // from preferred to least preferred
@@ -185,14 +184,6 @@ struct tracking
 	std::array<view, 2> views;
 	std::vector<pose> device_poses;
 
-	struct fb_face2
-	{
-		std::array<float, XR_FACE_EXPRESSION2_COUNT_FB> weights;
-		std::array<float, XR_FACE_CONFIDENCE2_COUNT_FB> confidences;
-		bool is_valid;
-		bool is_eye_following_blendshapes_valid;
-	};
-	std::optional<fb_face2> face;
 };
 
 struct trackings
@@ -437,7 +428,6 @@ struct tracking_control
 		right_palm,
 		left_hand,
 		right_hand,
-		face,
 		battery,
 		microphone,
 

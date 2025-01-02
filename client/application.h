@@ -21,7 +21,6 @@
 
 #include "configuration.h"
 #include "wifi_lock.h"
-#include "xr/fb_face_tracker2.h"
 #include "xr/hand_tracker.h"
 #ifdef __ANDROID__
 #include <android_native_app_glue.h>
@@ -125,9 +124,6 @@ class application : public singleton<application>
 	bool hand_tracking_supported = false;
 	xr::hand_tracker left_hand;
 	xr::hand_tracker right_hand;
-
-	bool fb_face_tracking2_supported = false;
-	xr::fb_face_tracker2 fb_face_tracker2;
 
 	bool eye_gaze_supported = false;
 
@@ -408,11 +404,6 @@ public:
 		return instance().hand_tracking_supported;
 	}
 
-	static bool get_fb_face_tracking2_supported()
-	{
-		return instance().fb_face_tracking2_supported;
-	}
-
 	static bool get_eye_gaze_supported()
 	{
 		return instance().eye_gaze_supported;
@@ -426,11 +417,6 @@ public:
 	static xr::hand_tracker & get_right_hand()
 	{
 		return instance().right_hand;
-	}
-
-	static xr::fb_face_tracker2 & get_fb_face_tracker2()
-	{
-		return instance().fb_face_tracker2;
 	}
 
 	static const std::vector<std::string> & get_xr_extensions()

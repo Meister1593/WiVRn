@@ -195,7 +195,6 @@ void scenes::stream::tracking()
 	int skip_samples = 0;
 
 	const bool hand_tracking = config.check_feature(feature::hand_tracking);
-	const bool face_tracking = config.check_feature(feature::face_tracking);
 
 	while (not exiting)
 	{
@@ -272,10 +271,6 @@ void scenes::stream::tracking()
 							        locate_hands(application::get_right_hand(), world_space, t0 + Δt));
 					}
 
-					if (face_tracking and control.enabled[size_t(tid::face)])
-					{
-						application::get_fb_face_tracker2().get_weights(t0 + Δt, packet.face.emplace());
-					}
 				}
 				catch (const std::system_error & e)
 				{
