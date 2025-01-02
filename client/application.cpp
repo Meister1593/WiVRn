@@ -991,7 +991,7 @@ void application::set_server_uri(std::string uri)
 	}
 
 	auto colon = server_address.rfind(":");
-	int port = wivrn::default_port;
+	int port = 9757;
 	if (colon != std::string::npos)
 	{
 		port = std::stoi(server_address.substr(colon + 1));

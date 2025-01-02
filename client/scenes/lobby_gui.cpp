@@ -368,7 +368,7 @@ void scenes::lobby::gui_new_server()
 		current_tab = tab::server_list;
 		add_server_window_prettyname = "";
 		add_server_window_hostname = "";
-		add_server_window_port = wivrn::default_port;
+		add_server_window_port = 9757;
 		add_server_tcp_only = false;
 		add_server_cookie = "";
 		ImGui::CloseCurrentPopup();
@@ -399,7 +399,7 @@ void scenes::lobby::gui_new_server()
 
 		add_server_window_prettyname = "";
 		add_server_window_hostname = "";
-		add_server_window_port = wivrn::default_port;
+		add_server_window_port = 9757;
 		add_server_tcp_only = false;
 		add_server_cookie = "";
 		ImGui::CloseCurrentPopup();
@@ -662,19 +662,6 @@ void scenes::lobby::gui_settings()
 		if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) and (ImGui::GetItemFlags() & ImGuiItemFlags_Disabled))
 			tooltip(_("This feature is not supported by your headset"));
 		ImGui::EndDisabled();
-	}
-	{
-		ImGui::BeginDisabled(not application::get_fb_face_tracking2_supported());
-		bool enabled = config.check_feature(feature::face_tracking);
-		if (ImGui::Checkbox(_S("Enable face tracking"), &enabled))
-		{
-			config.set_feature(feature::face_tracking, enabled);
-			config.save();
-		}
-		ImGui::EndDisabled();
-		if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled) and (ImGui::GetItemFlags() & ImGuiItemFlags_Disabled))
-			tooltip(_("This feature is not supported by your headset"));
-		vibrate_on_hover();
 	}
 
 	ImGui::BeginDisabled(passthrough_supported == xr::system::passthrough_type::no_passthrough);
@@ -946,208 +933,6 @@ static void ScrollWhenDraggingOnVoid()
 	held_prev = held;
 }
 
-static auto face_weights()
-{
-	using weights = decltype(wivrn::from_headset::tracking::fb_face2{}.weights);
-	using item = std::pair<const char *, std::array<float, XR_FACE_EXPRESSION2_COUNT_FB>>;
-	std::vector<item> res;
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_SMILE, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_TIRED, face);
-	}
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_SURPRISE, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_CLOSED_L_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_SMILE_WINK, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_CLOSED_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_SMILE_WINK, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_SMILE_BEAM, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_EYES_LOOK_DOWN_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_EYES_LOOK_DOWN_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_SAD_CRY, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_LOOK_UP_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_EYES_LOOK_UP_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_ROLLING_EYES, face);
-	}
-
-	{
-		weights face{};
-		res.emplace_back(ICON_FA_FACE_MEH, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_CLOSED_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_LAUGH_WINK, face);
-	}
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_CLOSED_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_LAUGH_WINK, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_LAUGH_SQUINT, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_LAUGH, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_INNER_BROW_RAISER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_INNER_BROW_RAISER_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_GRIN_WIDE, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_CLOSED_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_TONGUE_OUT_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_GRIN_TONGUE_WINK, face);
-	}
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_EYES_CLOSED_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_TONGUE_OUT_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_GRIN_TONGUE_WINK, face);
-	}
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LID_TIGHTENER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_TONGUE_OUT_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_GRIN_TONGUE_SQUINT, face);
-	}
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_TONGUE_OUT_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_GRIN_TONGUE, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_PULLER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 0.5;
-		res.emplace_back(ICON_FA_FACE_GRIN, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_CHIN_RAISER_T_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_STRETCHER_L_FB] = 0.5;
-		face[XR_FACE_EXPRESSION2_LIP_STRETCHER_R_FB] = 0.5;
-		res.emplace_back(ICON_FA_FACE_GRIMACE, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_JAW_DROP_FB] = 0.5;
-		res.emplace_back(ICON_FA_FACE_FROWN_OPEN, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_CORNER_DEPRESSOR_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_FROWN, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_UPPER_LID_RAISER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_UPPER_LID_RAISER_R_FB] = 1;
-		face[XR_FACE_EXPRESSION2_LIP_TIGHTENER_L_FB] = 0.5;
-		face[XR_FACE_EXPRESSION2_LIP_TIGHTENER_R_FB] = 0.5;
-		res.emplace_back(ICON_FA_FACE_FLUSHED, face);
-	}
-
-	{
-		weights face{};
-		face[XR_FACE_EXPRESSION2_BROW_LOWERER_L_FB] = 1;
-		face[XR_FACE_EXPRESSION2_BROW_LOWERER_R_FB] = 1;
-		res.emplace_back(ICON_FA_FACE_ANGRY, face);
-	}
-
-	return res;
-}
-
-static const char * get_face_icon(XrTime predicted_display_time)
-{
-	static const auto w = face_weights();
-	wivrn::from_headset::tracking::fb_face2 expression;
-	application::get_fb_face_tracker2().get_weights(predicted_display_time, expression);
-
-	if (not expression.is_valid)
-		return ICON_FA_FACE_MEH;
-
-	return std::ranges::min_element(w, std::ranges::less(), [&](const auto & p) {
-		       float res = 0;
-		       for (size_t i = 0; i < XR_FACE_EXPRESSION2_COUNT_FB; ++i)
-		       {
-			       float d = expression.weights[i] - p.second[i];
-			       res += d * d;
-		       }
-		       return res;
-	       })
-	        ->first;
-}
 
 void scenes::lobby::draw_features_status(XrTime predicted_display_time)
 {
@@ -1193,17 +978,6 @@ void scenes::lobby::draw_features_status(XrTime predicted_display_time)
 		        .tooltip_disabled = _("Eye tracking is disabled"),
 		        .icon_enabled = ICON_FA_EYE,
 		        .icon_disabled = ICON_FA_EYE_SLASH,
-		});
-	}
-
-	if (application::get_fb_face_tracking2_supported())
-	{
-		items.push_back({
-		        .f = feature::face_tracking,
-		        .tooltip_enabled = _("Face tracking is enabled"),
-		        .tooltip_disabled = _("Face tracking is disabled"),
-		        .icon_enabled = get_face_icon(predicted_display_time),
-		        .icon_disabled = ICON_FA_FACE_MEH_BLANK,
 		});
 	}
 

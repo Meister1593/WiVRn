@@ -196,24 +196,6 @@ const char * permission_name(feature f)
 					return nullptr;
 			}
 			__builtin_unreachable();
-		case feature::face_tracking:
-			switch (guess_model())
-			{
-				case model::oculus_quest:
-				case model::oculus_quest_2:
-				case model::meta_quest_pro:
-				case model::meta_quest_3:
-				case model::meta_quest_3s:
-					return "com.oculus.permission.FACE_TRACKING";
-				case model::pico_neo_3:
-				case model::pico_4:
-				case model::htc_vive_focus_3:
-				case model::htc_vive_xr_elite:
-				case model::lynx_r1:
-				case model::unknown:
-					return nullptr;
-			}
-			__builtin_unreachable();
 	}
 	__builtin_unreachable();
 }

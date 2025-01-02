@@ -315,6 +315,7 @@ void wivrn_session::operator()(from_headset::hand_tracking && hand_tracking)
 	left_hand.update_hand_tracking(hand_tracking, offset);
 	right_hand.update_hand_tracking(hand_tracking, offset);
 }
+
 void wivrn_session::operator()(from_headset::inputs && inputs)
 {
 	auto offset = get_offset();

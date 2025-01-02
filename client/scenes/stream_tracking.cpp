@@ -218,7 +218,6 @@ void scenes::stream::tracking()
 				std::lock_guard lock(tracking_control_mutex);
 				control = tracking_control;
 			}
-
 			XrDuration prediction = std::clamp<XrDuration>(control.offset.count(), 0, 80'000'000);
 			auto period = std::max<XrDuration>(display_time_period.load(), 1'000'000);
 			for (XrDuration Δt = 0; Δt <= prediction + period / 2; Δt += period, ++samples)
@@ -226,7 +225,6 @@ void scenes::stream::tracking()
 				auto & packet = tracking.emplace_back();
 				packet.production_timestamp = t0;
 				packet.timestamp = t0 + Δt;
-
 				try
 				{
 					auto [flags, views] = session.locate_views(XR_VIEW_CONFIGURATION_TYPE_PRIMARY_STEREO, t0 + Δt, view_space);
@@ -271,6 +269,9 @@ void scenes::stream::tracking()
 							        locate_hands(application::get_right_hand(), world_space, t0 + Δt));
 					}
 
+					XrDuration busy_time = t.count();
+					// Target: polling between 1 and 5ms, with 20% busy time
+					tracking_period = std::clamp<XrDuration>(std::lerp(tracking_period, busy_time * 5, 0.2), min_tracking_period, max_tracking_period);
 				}
 				catch (const std::system_error & e)
 				{

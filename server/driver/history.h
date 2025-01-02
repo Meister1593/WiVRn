@@ -132,7 +132,7 @@ public:
 		if (data.front().at_timestamp_ns > at_timestamp_ns)
 		{
 			if constexpr (extrapolation)
-			{
+		{
 				auto second = data.begin();
 				auto first = second++;
 				at_timestamp_ns = std::max(at_timestamp_ns, data.front().at_timestamp_ns - extrapolation);

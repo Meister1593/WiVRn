@@ -45,7 +45,6 @@ enum class feature
 	microphone,
 	hand_tracking,
 	eye_gaze,
-	face_tracking,
 };
 
 model guess_model();

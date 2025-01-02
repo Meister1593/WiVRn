@@ -103,10 +103,6 @@ bool configuration::check_feature(feature f) const
 				if (not application::get_eye_gaze_supported())
 					return false;
 				break;
-			case feature::face_tracking:
-				if (not application::get_fb_face_tracking2_supported())
-					return false;
-				break;
 		}
 	}
 #ifdef __ANDROID__
